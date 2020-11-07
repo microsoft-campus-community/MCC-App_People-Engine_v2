@@ -32,10 +32,10 @@ export async function getUsersByCampus(campusId:string):Promise<{[key:string]:an
 }
 
 export async function createUser(firstName:string, lastName:string,alternateMail:string, campusId:string) {
-    let mailLastName = lastName;
+    let mailFirstName = normalize(firstName);
+    let mailLastName = normalize(lastName);
     const password = generatePassword();
-    const mailAdress = normalize(firstName)+"."+normalize(mailLastName) + "@campus-community.org";
-    if (mailLastName.indexOf(" ") >= 0) mailLastName = mailLastName.substr(0,mailLastName.indexOf(" "));
+    const mailAdress = mailFirstName+"."+mailLastName + "@campus-community.org";
     const usersCampus = await getCampus(campusId);
     const campusLead = await getCampusLead(campusId);
     const userPayload = {
@@ -46,7 +46,7 @@ export async function createUser(firstName:string, lastName:string,alternateMail
         jobTitle: "Member",
         officeLocation: usersCampus.displayName.substr(usersCampus.displayName.indexOf(" ") + 1, usersCampus.displayName.length),
         displayName: firstName + " " + lastName,
-        mailNickname: firstName + "." + mailLastName,
+        mailNickname: mailFirstName + "." + mailLastName,
         userPrincipalName: mailAdress,
         passwordProfile: {
             forceChangePasswordNextSignIn: true,
