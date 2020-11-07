@@ -21,7 +21,7 @@ export function normalize(str: string) {
         .replace(new RegExp('[' + Object.keys(umlautMap).join('|') + ']', "g"),
             (a) => umlautMap[a]
         );
-        standard = (standard as any).replaceAll(" ",".");
+        standard = (standard as any).split(" ").join(".");
         return standard;
 }
 
