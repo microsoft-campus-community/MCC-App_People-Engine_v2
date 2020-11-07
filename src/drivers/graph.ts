@@ -2,13 +2,10 @@ import fetch, { RequestInit } from "node-fetch";
 import { URLSearchParams } from "url";
 import config from "../config";
 
-export async function getAllUsers():Promise<Array<{[key:string]:any}>> {
-    const users = await query("/users");
-    return users;
-}
 
 
-async function query(database:string, method?:string, payload?:{[key:string]:any}, token?:string) {
+
+export async function query(database:string, method?:string, altHeaders?: {[key:string]:any}, payload?:{[key:string]:any}, token?:string) {
     if(!token) token = await getApplicationToken();
     let options:RequestInit = {
         method: method || "GET",
@@ -20,9 +17,18 @@ async function query(database:string, method?:string, payload?:{[key:string]:any
         options.body = JSON.stringify(payload);
         (options.headers as any)["Content-Type"] = "application/json";
     }
+    if(altHeaders) {
+        altHeaders["Authorization"] = "Bearer "+token;
+        options.headers = altHeaders;
+    }
     const request = await fetch("https://graph.microsoft.com/v1.0/"+database, options);
-    const json = await request.json();
-    return json;
+    try {
+        const json = await request.json();
+        return json;
+    }
+    catch(e) {return request.status;}
+    
+    
 }
 
 async function getApplicationToken():Promise<string> { 
