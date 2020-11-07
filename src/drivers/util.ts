@@ -1,7 +1,9 @@
 import config from "../config";
+import { getCampusLead } from "./campus";
 import { query } from "./graph";
+import { renderMail } from "./renderWelcomeEmail";
 
-export function replaceUmlaute(str: string) {
+export function normalize(str: string) {
     const umlautMap: { [key: string]: string } = {
         '\u00dc': 'UE',
         '\u00c4': 'AE',
@@ -11,7 +13,7 @@ export function replaceUmlaute(str: string) {
         '\u00f6': 'oe',
         '\u00df': 'ss',
     }
-    return str
+    let standard =  str
         .replace(/[\u00dc|\u00c4|\u00d6][a-z]/g, (a) => {
             const big = umlautMap[a.slice(0, 1)];
             return big.charAt(0) + big.charAt(1).toLowerCase() + a.slice(1);
@@ -19,6 +21,8 @@ export function replaceUmlaute(str: string) {
         .replace(new RegExp('[' + Object.keys(umlautMap).join('|') + ']', "g"),
             (a) => umlautMap[a]
         );
+        standard = (standard as any).replaceAll(" ",".");
+        return standard;
 }
 
 export function generatePassword(): string {
@@ -31,12 +35,12 @@ export function generatePassword(): string {
     return result;
 }
 
-export async function sendUserCreationMessage(firstName:string, password: string, principalMail:string, alternateMail:string) {
+export async function sendUserCreationMessage(leadName:string, leadMail:string, password: string, principalMail:string, alternateMail:string) {
     const message = await query("/users/"+config.mailsender+"/messages", "POST", undefined, {
         "subject":"Welcome to the Microsoft Campus Community!",
         "body":{
             "contentType":"HTML",
-            "content":"We <b>love</b> you "+firstName+"! Sign in with:<br><br>E-Mail Adress: "+principalMail+"<br>Password: "+password+"<br><br>Cheers,<br>MCC"
+            "content": renderMail(principalMail,password,leadName,leadMail)
         },
         "toRecipients":[
             {

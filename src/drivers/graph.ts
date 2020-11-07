@@ -21,14 +21,16 @@ export async function query(database:string, method?:string, altHeaders?: {[key:
         altHeaders["Authorization"] = "Bearer "+token;
         options.headers = altHeaders;
     }
-    const request = await fetch("https://graph.microsoft.com/v1.0/"+database, options);
-    try {
-        const json = await request.json();
-        return json;
-    }
-    catch(e) {return request.status;}
-    
-    
+    const request = await fetch("https://graph.microsoft.com/v1.0/"+database, options).catch(e => {
+        console.error(e);
+    })
+    if(request) {
+        try {
+            const json = await request.json();
+            return json;
+        }
+        catch(e) {return request.status;}
+    } 
 }
 
 async function getApplicationToken():Promise<string> { 
