@@ -20,7 +20,6 @@ router.use(jwt({
   issuer: 'https://login.microsoftonline.com/6fa69a93-be90-4d2c-a4eb-95e1cc558538/v2.0',
   algorithms: ['RS256']
 }))
-
 router.use("/users", userRouter);
 router.use("/campus", campusRouter);
 router.use("/me", tokenBasedRouter);
