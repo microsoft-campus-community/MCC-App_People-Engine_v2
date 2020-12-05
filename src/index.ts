@@ -16,7 +16,7 @@ let swaggerOptions = {
             title: 'MCC People Engine',
             version: '1.0.0',
         },
-        host: 'localhost:3001',
+        host: 'https://commasto-people-engine.azurewebsites.net/',
         basePath: '/api',
         produces: [
             "application/json",
